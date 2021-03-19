@@ -1,5 +1,6 @@
-import moment from 'moment';
+import { MikroORM } from '@mikro-orm/core';
 import fetch from 'node-fetch'
+import {Submission} from '../models/Submission'
 
 const PUSH_SHIFT_URL = "https://api.pushshift.io/reddit/";
 const SUBMISSION_URL = PUSH_SHIFT_URL + "submission/search";
@@ -18,7 +19,7 @@ type SubmissionJson = {
     title: string,
     created_utc: number,
     url: string,
-    score: string, 
+    score: number, 
     author: string,
     id: string,
     num_comments: number
@@ -39,15 +40,25 @@ const submmissionSearch = (parameters: SubmissionParameters): Promise<Submission
 }
 
 const main = async () => {
+
+    const orm = await MikroORM.init({
+        entities: [Submission],
+        dbName: 'redditdb',
+        type: 'mongo',
+        clientUrl: process.env.DB_HOST
+    });
+
+    const {em} = orm;
+
     const response = await submmissionSearch({subreddit: "ethfinance", title: "Daily general discussion", sort: "asc", sort_type: "created_utc", size: 500});
 
-    response.data.map(sub => console.log({
-        title: sub.title,
-        created: moment(sub.created_utc * 1000).format(),
-        comments: sub.num_comments
-    }));
+    const submissionEntities = response.data.map(sub => new Submission(sub.id, sub.title, sub.created_utc, sub.url, sub.score, sub.author, sub.num_comments));
 
-    console.log({len: response.data.length})
+    await em.persistAndFlush(submissionEntities);
+
+    console.log("saved!");
+
+    await orm.close();
 }
 
 main();
