@@ -1,7 +1,7 @@
 import {BaseEntity, Entity, PrimaryKey, Property} from '@mikro-orm/core'
 
 @Entity()
-export class Submission {
+export class Submission extends BaseEntity<Submission, 'id'>{
 
     @PrimaryKey()
     id!: string;
@@ -25,6 +25,7 @@ export class Submission {
     num_comments!: number
 
     constructor(id: string, title: string, created_utc: number, url: string, score: number, author: string, num_comments: number){
+        super();
         this.id = id;
         this.title = title;
         this.created_utc = created_utc;
