@@ -4,12 +4,8 @@
   "description": "A tool to scrape data from reddit and analyze sentiment",
   "main": "index.js",
   "scripts": {
-<<<<<<< HEAD
     "scrape": "node ./build/scripts/pushshiftscraper.js",
     "dev": "tsc -w"
-=======
-    "scrape": "node ./build/scripts/pushshiftscraper.js"
->>>>>>> e771d0abd4422131f5695039184d9f84d98867d3
   },
   "author": "",
   "license": "ISC",
