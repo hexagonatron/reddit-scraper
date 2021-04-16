@@ -1,5 +1,11 @@
+import { MikroORM } from '@mikro-orm/core';
 import moment from 'moment';
 import fetch from 'node-fetch'
+import { Submission } from '../models/Submission'
+import { config } from 'dotenv';
+import { BaseRepository } from '../repositories/BaseRepository';
+
+config();
 
 const PUSH_SHIFT_URL = "https://api.pushshift.io/reddit/";
 const SUBMISSION_URL = PUSH_SHIFT_URL + "submission/search";
@@ -18,7 +24,7 @@ type SubmissionJson = {
     title: string,
     created_utc: number,
     url: string,
-    score: string, 
+    score: number,
     author: string,
     id: string,
     num_comments: number
@@ -28,10 +34,10 @@ type SubmissionResponse = {
     data: SubmissionJson[]
 }
 
-const submmissionSearch = (parameters: SubmissionParameters): Promise<SubmissionResponse> => {
+const submissionSearch = (parameters: SubmissionParameters): Promise<SubmissionResponse> => {
     const params = new URLSearchParams();
-    for(const [key, value] of Object.entries(parameters)) {
-        if(value) params.append(key, value.toString());
+    for (const [key, value] of Object.entries(parameters)) {
+        if (value) params.append(key, value.toString());
     }
     const url = SUBMISSION_URL + "?" + params.toString();
     console.log(url)
@@ -39,15 +45,21 @@ const submmissionSearch = (parameters: SubmissionParameters): Promise<Submission
 }
 
 const main = async () => {
-    const response = await submmissionSearch({subreddit: "ethfinance", title: "Daily general discussion", sort: "asc", sort_type: "created_utc", size: 500});
 
-    response.data.map(sub => console.log({
-        title: sub.title,
-        created: moment(sub.created_utc * 1000).format(),
-        comments: sub.num_comments
-    }));
+    const orm = await MikroORM.init({
+        entities: [Submission],
+        dbName: 'redditdb',
+        type: 'mongo',
+        clientUrl: process.env.DB_HOST,
+        entityRepository: BaseRepository
+    });
 
-    console.log({len: response.data.length})
+    const { em } = orm;
+    const response = await submissionSearch({ subreddit: "ethfinance", title: "Daily general discussion", sort: "asc", sort_type: "created_utc", size: 500 });
+    const subRepo = em.getRepository(Submission);
+    const entities = response.data.map(sub => new Submission(sub.title, sub.created_utc, sub.url, sub.score, sub.author, sub.id));
+    await subRepo.upsert(entities, "id");
+    await orm.close();
 }
 
 main();

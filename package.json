@@ -4,7 +4,8 @@
   "description": "A tool to scrape data from reddit and analyze sentiment",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "scrape": "node ./build/scripts/pushshiftscraper.js",
+    "dev": "tsc -w"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +16,8 @@
     "typescript": "^4.1.5"
   },
   "dependencies": {
+    "@mikro-orm/core": "^4.4.4",
+    "@mikro-orm/mongodb": "^4.4.4",
     "dotenv": "^8.2.0",
     "form-data": "^3.0.0",
     "full-icu": "^1.3.1",
