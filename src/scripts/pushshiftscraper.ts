@@ -4,6 +4,7 @@ import fetch from 'node-fetch'
 import { Submission } from '../models/Submission'
 import { config } from 'dotenv';
 import { BaseRepository } from '../repositories/BaseRepository';
+import PushShiftAPI from '../lib/PushshiftApi';
 
 config();
 

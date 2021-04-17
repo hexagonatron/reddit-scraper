@@ -9,6 +9,7 @@ class PushshiftApi extends BaseApi{
     }
 
     public getSubmissions() {
+
     }
 
     public getComments() {
