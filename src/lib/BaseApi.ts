@@ -1,3 +1,4 @@
+import fetch, {RequestInit, BodyInit, HeaderInit} from 'node-fetch';
 
 abstract class BaseApi {
     private baseUrl:string;
@@ -17,7 +18,7 @@ abstract class BaseApi {
             });
     }
 
-    protected postRequest<ResponseType>(path: string, body: FormData, headers?: Headers): Promise<ResponseType> {
+    protected postRequest<ResponseType>(path: string, body: BodyInit, headers?: HeaderInit): Promise<ResponseType> {
         const options: RequestInit = {
             body: body,
             headers: headers,
@@ -27,7 +28,7 @@ abstract class BaseApi {
         return this.httpRequest<ResponseType>(this.baseUrl + path, options);
     }
 
-    protected getRequest<ResponseType>(path: string, headers?: Headers): Promise<ResponseType> {
+    protected getRequest<ResponseType>(path: string, headers?: HeaderInit): Promise<ResponseType> {
 
         const options: RequestInit = {
             headers: headers,
@@ -37,7 +38,7 @@ abstract class BaseApi {
         return this.httpRequest<ResponseType>(this.baseUrl + path, options);
     }
 
-    protected putRequest<ResponseType>(path: string, body: FormData, headers?: Headers): Promise<ResponseType> {
+    protected putRequest<ResponseType>(path: string, body: BodyInit, headers?: HeaderInit): Promise<ResponseType> {
         const options: RequestInit = {
             body: body,
             headers: headers,
@@ -47,7 +48,7 @@ abstract class BaseApi {
         return this.httpRequest<ResponseType>(this.baseUrl + path, options);
     }
 
-    protected deleteRequest<ResponseType>(path: string, headers?: Headers): Promise<ResponseType> {
+    protected deleteRequest<ResponseType>(path: string, headers?: HeaderInit): Promise<ResponseType> {
 
         const options: RequestInit = {
             headers: headers,
