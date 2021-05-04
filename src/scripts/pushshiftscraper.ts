@@ -1,16 +1,38 @@
 import { MikroORM } from '@mikro-orm/core';
-import moment from 'moment';
-import fetch from 'node-fetch'
 import { Submission } from '../models/Submission'
 import { config } from 'dotenv';
 import { BaseRepository } from '../repositories/BaseRepository';
-import PushShiftAPI from '../lib/PushShiftApi';
+import PushShiftAPI, { SubmissionJson, SubmissionParameters } from '../lib/PushShiftApi';
 
 config();
+
+const defaultSubmissionParameters: SubmissionParameters = {
+    subreddit: "ethfinance",
+    title: "Daily general discussion",
+    sort: "asc",
+    sort_type: "created_utc",
+    size: 500
+}
 
 const main = async () => {
 
     const Api = new PushShiftAPI();
+
+    const getAllSubmissionsAfterTime = async (after_utc: number): Promise<SubmissionJson[]> => {
+        const response = await Api.getSubmissions({ ...defaultSubmissionParameters, after: after_utc }); 
+
+        if (!response.data.length) {
+            return [];
+        }
+        const mostRecentSubmissionTime = response.data[response.data.length -1].created_utc;
+        const recursiveSubmissions = await getAllSubmissionsAfterTime(mostRecentSubmissionTime);
+        return response.data.concat(recursiveSubmissions);
+    }
+
+    const getAllSubmissionEntities = async () => {
+        const submissions = await getAllSubmissionsAfterTime(0);
+        return submissions.map(sub => new Submission(sub.title, sub.created_utc, sub.url, sub.score, sub.author, sub.id));
+    }
 
     const orm = await MikroORM.init({
         entities: [Submission],
@@ -21,9 +43,10 @@ const main = async () => {
     });
 
     const { em } = orm;
-    const response = await Api.getSubmissions({ subreddit: "ethfinance", title: "Daily general discussion", sort: "asc", sort_type: "created_utc", size: 500 });
     const subRepo = em.getRepository(Submission);
-    const entities = response.data.map(sub => new Submission(sub.title, sub.created_utc, sub.url, sub.score, sub.author, sub.id));
+
+    const entities = await getAllSubmissionEntities();
+    console.log(entities);
     await subRepo.upsert(entities, "id");
     await orm.close();
 }

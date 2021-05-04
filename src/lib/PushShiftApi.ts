@@ -5,8 +5,8 @@ interface BasePushShiftParameters {
     sort_type?: string
     after?: number
     before?: number
-    after_id?: number
-    before_id?: number
+    after_id?: string 
+    before_id?: string
     created_utc?: number
     score?: number
     gilded?: number
@@ -28,9 +28,10 @@ interface BasePushShiftParameters {
     subreddit_type?: string
     author_flair_css_class?: string
     author_flair_text?: string
+    size?: number
 }
 
-interface SubmissionParameters extends BasePushShiftParameters {
+export interface SubmissionParameters extends BasePushShiftParameters {
     over_18?: boolean
     locked?: boolean
     spoiler?: boolean
@@ -61,7 +62,7 @@ interface SubmissionParameters extends BasePushShiftParameters {
     thumbnail?: string
 }
 
-interface CommentParameters extends BasePushShiftParameters {
+export interface CommentParameters extends BasePushShiftParameters {
     reply_delay?: number
     nest_level?: number
     sub_reply_delay?: number
@@ -83,7 +84,7 @@ interface CommentParameters extends BasePushShiftParameters {
     subreddit_id?: string
 }
 
-type SubmissionJson = {
+export type SubmissionJson = {
     title: string,
     created_utc: number,
     url: string,
@@ -93,7 +94,7 @@ type SubmissionJson = {
     num_comments: number
 }
 
-type CommentJson = {
+export type CommentJson = {
     author: string
     author_fullname: string
     body: string
@@ -111,11 +112,11 @@ type CommentJson = {
     subreddit_id: string
 }
 
-type SubmissionResponse = {
+export type SubmissionResponse = {
     data: SubmissionJson[]
 }
 
-type CommentResponse = {
+export type CommentResponse = {
     data: CommentJson[]
 }
 
