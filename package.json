@@ -4,7 +4,8 @@
   "description": "A tool to scrape data from reddit and analyze sentiment",
   "main": "index.js",
   "scripts": {
-    "scrape": "node ./build/scripts/pushshiftscraper.js",
+    "scrape:subs": "node ./build/scripts/submissionScraper.js",
+    "scrape:comments": "node ./build/scripts/commentScraper.js",
     "dev": "tsc -w"
   },
   "author": "",

@@ -67,8 +67,8 @@ export interface CommentParameters extends BasePushShiftParameters {
     nest_level?: number
     sub_reply_delay?: number
     utc_hour_of_week?: number
-    link_id?: number
-    parent_i?: number
+    link_id?: string
+    parent_i?: string
     author?: string
     author_fullname?: string
     body?: string
@@ -96,17 +96,17 @@ export type SubmissionJson = {
 
 export type CommentJson = {
     author: string
-    author_fullname: string
+    author_fullname?: string
     body: string
     created_utc: number
     id: string
     link_id: string
-    locked: boolean
+    locked?: boolean
     parent_id: string
-    permalink: string
+    permalink?: string
     retrieved_on: number
-    score: number
-    send_replies: boolean
+    score?: number
+    send_replies?: boolean
     stickied: boolean
     subreddit: string
     subreddit_id: string
@@ -139,9 +139,9 @@ class PushshiftApi extends BaseApi {
     public getComments(parameters: CommentParameters): Promise<CommentResponse> {
         const searchParams = new URLSearchParams();
         for (const [key, value] of Object.entries(parameters)) {
-            if (value) searchParams.append(key, value.toString());
+            if (value != undefined) searchParams.append(key, value.toString());
         }
-        return this.getRequest("/submission/comment?" + searchParams.toString());
+        return this.getRequest("/comment/search?" + searchParams.toString());
     }
 }
 

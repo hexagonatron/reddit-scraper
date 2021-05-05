@@ -46,7 +46,6 @@ const main = async () => {
     const subRepo = em.getRepository(Submission);
 
     const entities = await getAllSubmissionEntities();
-    console.log(entities);
     await subRepo.upsert(entities, "id");
     await orm.close();
 }

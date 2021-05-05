@@ -3,8 +3,10 @@ import { AnyEntity, EntityRepository, EntityRepositoryType, FilterQuery, wrap } 
 export class BaseRepository<T extends AnyEntity<T>> extends EntityRepository<T> {
 
     async upsert(data: AnyEntity<T>[], where: keyof T) {
-        const entities = await Promise.all(data.map(ent => this.doUpsert(ent, { [where]: ent[where] })));
-        return this.persistAndFlush(entities);
+        for (const entity of data) {
+            const newEntity = await this.doUpsert(entity, {[where]: entity[where]})
+            await this.persistAndFlush(newEntity);
+        }
     }
 
     async upsertOne(data: AnyEntity<T>, where: FilterQuery<T>) {
