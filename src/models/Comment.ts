@@ -1,10 +1,10 @@
-import { Entity, BaseEntity, Property, PrimaryKey, EntityRepositoryType } from '@mikro-orm/core'
-import { BaseRepository } from '../repositories/BaseRepository';
+import { Entity, BaseEntity, Property, PrimaryKey, EntityRepositoryType, SerializedPrimaryKey } from '@mikro-orm/core'
+import { CommentRepository } from '../repositories/CommentRepository';
 
-@Entity()
+@Entity({customRepository: () => CommentRepository})
 export class Comment extends BaseEntity<Comment, 'id'>{
 
-    [EntityRepositoryType]?: BaseRepository<Comment>;
+    [EntityRepositoryType]?: CommentRepository;
 
     @Property()
     author!: string;
@@ -19,6 +19,9 @@ export class Comment extends BaseEntity<Comment, 'id'>{
     score?: number;
 
     @PrimaryKey()
+    _id!: string;
+
+    @SerializedPrimaryKey()
     id!: string;
 
     @Property()
@@ -39,7 +42,7 @@ export class Comment extends BaseEntity<Comment, 'id'>{
         this.created_utc = created_utc;
         this.body = body;
         this.score = score;
-        this.id = id;
+        this._id = id;
         this.link_id = link_id;
         this.parent_id = parent_id;
         this.subreddit = subreddit;

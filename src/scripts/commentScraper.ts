@@ -1,7 +1,9 @@
 import PushshiftApi, { CommentJson, CommentParameters } from "../lib/PushShiftApi";
-import {Comment} from '../models/Comment';
+import { Comment } from '../models/Comment';
 import { config } from 'dotenv';
 import db from "../db/db";
+import { QueryOrder } from "@mikro-orm/core";
+import { Submission } from "src/models/Submission";
 
 config();
 
@@ -11,9 +13,11 @@ const defaultCommentParameters: CommentParameters = {
     sort_type: "created_utc"
 }
 
+const SECONDS_IN_1_WEEK = 60 * 60 * 24 * 7;
+
 const main = async () => {
     const Api = new PushshiftApi();
-    const { orm, commentRepository, em } = await db.connect();
+    const { orm, em, commentRepository, submissionRepository } = await db.connect();
 
     const getAllCommentsFromSubmission = async (submissionId: string) => {
 
@@ -31,11 +35,35 @@ const main = async () => {
         return getCommentsAfterTime(0);
     }
 
-    const comments = await getAllCommentsFromSubmission("n4germ");
+    const alreadyFetchedComments = async (submissionId: string) => {
+        const alreadyFetchedComments = await commentRepository.getCommentsBySubmissionId(submissionId);
 
-    const entities = comments.map(({ author, created_utc, body, score, id, link_id, parent_id, subreddit, subreddit_id}) => new Comment(author, created_utc, body, score, id, link_id, parent_id, subreddit, subreddit_id))
+        if (alreadyFetchedComments.length === 0){
+            return false
+        }
+        const seconds = (Date.now() / 1000) - SECONDS_IN_1_WEEK;
+        return alreadyFetchedComments[0].created_utc < seconds; 
+    }
 
-    await commentRepository.upsert(entities, "id");
+    const persistAllCommentsFromSubmission = async (submission: Submission) => {
+        if ( await alreadyFetchedComments(submission.id)){
+            console.log(`[DEBUG] Already fetched comments for submission: ${submission.id}, "${submission.title}". Skipping`);
+            return
+        }
+        const comments = await getAllCommentsFromSubmission(submission.id);
+        const entities = comments.map(({ author, created_utc, body, score, id, link_id, parent_id, subreddit, subreddit_id }) => new Comment(author, created_utc, body, score, id, link_id, parent_id, subreddit, subreddit_id))
+
+        await commentRepository.upsert(entities, "id");
+    }
+
+    const submissions = await submissionRepository.findAll({
+        orderBy: { "created_utc": QueryOrder.ASC},
+        limit: 11
+    });
+
+    for (const submission of submissions) {
+        await persistAllCommentsFromSubmission(submission);
+    }
 
     orm.close();
 

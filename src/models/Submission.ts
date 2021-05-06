@@ -1,8 +1,8 @@
-import {Entity, BaseEntity, Property, PrimaryKey, EntityRepositoryType} from '@mikro-orm/core'
+import {Entity, BaseEntity, Property, PrimaryKey, EntityRepositoryType, SerializedPrimaryKey} from '@mikro-orm/core'
 import { BaseRepository } from '../repositories/BaseRepository';
 
 @Entity()
-export class Submission extends BaseEntity<Submission, 'id'>{
+export class Submission extends BaseEntity<Submission, 'id'> {
 
     [EntityRepositoryType]? : BaseRepository<Submission>;
 
@@ -22,6 +22,9 @@ export class Submission extends BaseEntity<Submission, 'id'>{
     author!: string;
 
     @PrimaryKey()
+    _id!: string;
+
+    @SerializedPrimaryKey()
     id!: string;
 
     @Property()
@@ -34,6 +37,6 @@ export class Submission extends BaseEntity<Submission, 'id'>{
         this.url = url;
         this.score = score;
         this.author = author;
-        this.id = id;
+        this._id = id;
     }
 }
