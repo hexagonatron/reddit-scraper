@@ -3,7 +3,7 @@ import { Comment } from '../models/Comment';
 import { config } from 'dotenv';
 import db from "../db/db";
 import { QueryOrder } from "@mikro-orm/core";
-import { Submission } from "src/models/Submission";
+import { Submission } from "models/Submission";
 
 config();
 
@@ -38,15 +38,15 @@ const main = async () => {
     const alreadyFetchedComments = async (submissionId: string) => {
         const alreadyFetchedComments = await commentRepository.getCommentsBySubmissionId(submissionId);
 
-        if (alreadyFetchedComments.length === 0){
+        if (alreadyFetchedComments.length === 0) {
             return false
         }
         const seconds = (Date.now() / 1000) - SECONDS_IN_1_WEEK;
-        return alreadyFetchedComments[0].created_utc < seconds; 
+        return alreadyFetchedComments[0].created_utc < seconds;
     }
 
     const persistAllCommentsFromSubmission = async (submission: Submission) => {
-        if ( await alreadyFetchedComments(submission.id)){
+        if (await alreadyFetchedComments(submission.id)) {
             console.log(`[DEBUG] Already fetched comments for submission: ${submission.id}, "${submission.title}". Skipping`);
             return
         }
@@ -56,10 +56,12 @@ const main = async () => {
         await commentRepository.upsert(entities, "id");
     }
 
-    const submissions = await submissionRepository.findAll({
-        orderBy: { "created_utc": QueryOrder.ASC},
-        limit: 11
-    });
+    const submissions = await submissionRepository.findAll(
+        {
+            orderBy: { "created_utc": QueryOrder.ASC },
+            limit: 20
+        }
+    );
 
     for (const submission of submissions) {
         await persistAllCommentsFromSubmission(submission);
