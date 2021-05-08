@@ -4,7 +4,6 @@ import { Comment } from '../models/Comment'
 import { Chunk } from '../models/Chunk'
 import { config } from 'dotenv';
 import { BaseRepository } from '../repositories/BaseRepository';
-import FlakeId from 'flake-idgen';
 
 config();
 

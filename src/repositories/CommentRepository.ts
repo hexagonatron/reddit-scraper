@@ -18,7 +18,7 @@ export class CommentRepository extends BaseRepository<Comment> {
         return this.find({
             created_utc: {
                 $gte: from_utc,
-                $lt: from_utc + SECONDS_IN_15_MINS,
+                $lte: from_utc + SECONDS_IN_15_MINS,
             }
         });
     }

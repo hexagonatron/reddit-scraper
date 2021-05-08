@@ -6,6 +6,7 @@
   "scripts": {
     "scrape:subs": "node ./build/scripts/submissionScraper.js",
     "scrape:comments": "node ./build/scripts/commentScraper.js",
+    "chunker": "node ./build/scripts/commentChunker.js",
     "dev": "tsc -w"
   },
   "author": "",
