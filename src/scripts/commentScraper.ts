@@ -53,19 +53,17 @@ const main = async () => {
         const comments = await getAllCommentsFromSubmission(submission.id);
         const entities = comments.map(({ author, created_utc, body, score, id, link_id, parent_id, subreddit, subreddit_id }) => new Comment(author, created_utc, body, score, id, link_id, parent_id, subreddit, subreddit_id))
 
-        await commentRepository.upsert(entities, "id");
+        await em.fork().getRepository(Comment).upsert(entities, "id");
     }
 
     const submissions = await submissionRepository.findAll(
         {
             orderBy: { "created_utc": QueryOrder.ASC },
-            limit: 20
+            limit: 100
         }
     );
 
-    for (const submission of submissions) {
-        await persistAllCommentsFromSubmission(submission);
-    }
+    await Promise.all(submissions.map(submission => persistAllCommentsFromSubmission(submission)));
 
     orm.close();
 

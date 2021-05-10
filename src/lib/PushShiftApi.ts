@@ -125,7 +125,7 @@ const BASE_PUSHSHIFT_API = "https://api.pushshift.io/reddit"
 class PushshiftApi extends BaseApi {
 
     constructor() {
-        super(BASE_PUSHSHIFT_API);
+        super(BASE_PUSHSHIFT_API, 1);
     }
 
     public getSubmissions(parameters: SubmissionParameters): Promise<SubmissionResponse> {

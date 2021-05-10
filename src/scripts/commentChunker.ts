@@ -35,11 +35,6 @@ const main = async () => {
         return makeChunkFromComments(comments, fromTime);
     }
 
-
-    // const comments = await getCommentsFrom(1566202232);
-    // const timefrom = moment.utc('2019-08-19 00:00', "YYYY-MM-DD hh:mm").add(1, 'day').valueOf() / 1000;
-    // const comments = await getCommentsFrom(timefrom);
-
     let chunkTimeFrom = 0;
 
     if (await chunkRepository.count() === 0) {
