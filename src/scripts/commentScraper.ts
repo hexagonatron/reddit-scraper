@@ -3,7 +3,7 @@ import { Comment } from '../models/Comment';
 import { config } from 'dotenv';
 import db from "../db/db";
 import { QueryOrder } from "@mikro-orm/core";
-import { Submission } from "models/Submission";
+import { Submission } from "../models/Submission";
 
 config();
 
@@ -56,14 +56,22 @@ const main = async () => {
         await em.fork().getRepository(Comment).upsert(entities, "id");
     }
 
-    const submissions = await submissionRepository.findAll(
-        {
-            orderBy: { "created_utc": QueryOrder.ASC },
-            limit: 100
-        }
-    );
+    const submissionsToFetch = await submissionRepository.getSubmissionsWithNoScrapedComments();
 
-    await Promise.all(submissions.map(submission => persistAllCommentsFromSubmission(submission)));
+    let startIndex = 0;
+    const chunkedSubmissions = [];
+    while (startIndex < submissionsToFetch.length) {
+        chunkedSubmissions.push(submissionsToFetch.slice(startIndex, startIndex + 10));
+        startIndex += 10;
+    }
+
+    for (const submissionChunk of chunkedSubmissions) {
+        try {
+        await Promise.all(submissionChunk.map(submission => persistAllCommentsFromSubmission(submission)));
+        } catch (error) {
+            console.log(`[ERROR] ${new Date().toLocaleString()} ${error}`);
+        }
+    }
 
     orm.close();
 

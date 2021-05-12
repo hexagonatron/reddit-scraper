@@ -1,10 +1,10 @@
 import {Entity, BaseEntity, Property, PrimaryKey, EntityRepositoryType, SerializedPrimaryKey} from '@mikro-orm/core'
-import { BaseRepository } from '../repositories/BaseRepository';
+import { SubmissionRepository } from '../repositories/SubmissionRepository';
 
-@Entity()
+@Entity({customRepository: () => SubmissionRepository})
 export class Submission extends BaseEntity<Submission, 'id'> {
 
-    [EntityRepositoryType]? : BaseRepository<Submission>;
+    [EntityRepositoryType]? : SubmissionRepository;
 
     @Property()
     title!: string;

@@ -1,4 +1,5 @@
 import { FindOptions, Repository } from "@mikro-orm/core";
+import { MongoConnection } from "@mikro-orm/mongodb";
 import { Comment } from "models/Comment";
 import { BaseRepository } from "./BaseRepository";
 
@@ -21,6 +22,15 @@ export class CommentRepository extends BaseRepository<Comment> {
                 $lte: from_utc + SECONDS_IN_15_MINS,
             }
         });
+    }
+
+    async getUniqueSubmisisonIds() {
+        const distinctSubmissionIds: string[] = await this.getConnection().distinct('link_id');
+        return distinctSubmissionIds.map(id => id.replace("t3_",""))
+    }
+
+    private getConnection() {
+        return (this.em.getConnection() as MongoConnection).getCollection('Comment');
     }
 
 }
