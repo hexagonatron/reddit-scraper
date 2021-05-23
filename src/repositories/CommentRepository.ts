@@ -29,8 +29,22 @@ export class CommentRepository extends BaseRepository<Comment> {
         return distinctSubmissionIds.map(id => id.replace("t3_",""))
     }
 
+    public async getCommentsFrom(fromUtc: number) {
+        return this.find({
+            created_utc: {$gte: fromUtc}
+        }, {
+            orderBy: {created_utc: 1}
+        });
+    }
+
+    public async getCommentIdsFrom(fromUtc: number) {
+        const comments = await this.getCommentsFrom(fromUtc);
+        return comments.map(({id}) => id);
+    }
+
     private getConnection() {
         return (this.em.getConnection() as MongoConnection).getCollection('Comment');
     }
+
 
 }

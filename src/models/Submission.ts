@@ -1,4 +1,5 @@
 import {Entity, BaseEntity, Property, PrimaryKey, EntityRepositoryType, SerializedPrimaryKey} from '@mikro-orm/core'
+import { SubmissionJson } from '../lib/PushShiftApi';
 import { SubmissionRepository } from '../repositories/SubmissionRepository';
 
 @Entity({customRepository: () => SubmissionRepository})
@@ -38,5 +39,9 @@ export class Submission extends BaseEntity<Submission, 'id'> {
         this.score = score;
         this.author = author;
         this._id = id;
+    }
+
+    public static fromSubmissionJson({author, created_utc, id, score, title, url }: SubmissionJson) {
+        return new Submission(title,created_utc, url, score,author, id);
     }
 }

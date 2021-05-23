@@ -136,12 +136,21 @@ class PushshiftApi extends BaseApi {
         return this.getRequest("/submission/search?" + searchParams.toString());
     }
 
+    public getSubmissionsSince(sinceTime: number){
+        return this.getSubmissions({after: sinceTime, sort: "dsc", sort_type: "created_utc" });
+    } 
+
     public getComments(parameters: CommentParameters): Promise<CommentResponse> {
         const searchParams = new URLSearchParams();
         for (const [key, value] of Object.entries(parameters)) {
             if (value != undefined) searchParams.append(key, value.toString());
         }
         return this.getRequest("/comment/search?" + searchParams.toString());
+    }
+
+    public async getCommentsFrom(fromUtc: number) {
+        const {data} = await this.getComments({after: fromUtc, sort: "dsc", sort_type: "created_utc"});
+        return data;
     }
 }
 

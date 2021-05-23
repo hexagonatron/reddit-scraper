@@ -17,7 +17,7 @@ const SECONDS_IN_1_WEEK = 60 * 60 * 24 * 7;
 
 const main = async () => {
     const Api = new PushshiftApi();
-    const { orm, em, commentRepository, submissionRepository } = await db.connect();
+    const { orm, commentRepository, submissionRepository } = await db.connect();
 
     const getAllCommentsFromSubmission = async (submissionId: string) => {
 
@@ -53,10 +53,13 @@ const main = async () => {
         const comments = await getAllCommentsFromSubmission(submission.id);
         const entities = comments.map(({ author, created_utc, body, score, id, link_id, parent_id, subreddit, subreddit_id }) => new Comment(author, created_utc, body, score, id, link_id, parent_id, subreddit, subreddit_id))
 
+        const {em} = orm;
+
         await em.fork().getRepository(Comment).upsert(entities, "id");
     }
 
     const submissionsToFetch = await submissionRepository.getSubmissionsWithNoScrapedComments();
+    // const submissionsToFetch = await submissionRepository.findLastThreeDays();
 
     let startIndex = 0;
     const chunkedSubmissions = [];

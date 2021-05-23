@@ -1,4 +1,5 @@
 import { Entity, BaseEntity, Property, PrimaryKey, EntityRepositoryType, SerializedPrimaryKey } from '@mikro-orm/core'
+import { CommentJson } from '../lib/PushShiftApi';
 import { CommentRepository } from '../repositories/CommentRepository';
 
 @Entity({customRepository: () => CommentRepository})
@@ -47,5 +48,10 @@ export class Comment extends BaseEntity<Comment, 'id'>{
         this.parent_id = parent_id;
         this.subreddit = subreddit;
         this.subreddit_id = subreddit_id;
+    }
+
+    public static fromJson({author, body, created_utc, id, link_id, parent_id, subreddit, subreddit_id, score }: CommentJson) {
+        return new Comment(author, created_utc, body, score, id, link_id, parent_id, subreddit, subreddit_id);
+
     }
 }

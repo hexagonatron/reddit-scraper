@@ -46,7 +46,7 @@ const main = async () => {
         chunkTimeFrom = lastCompletedChunk?.end_utc + 1 || 0;
     }
 
-    const CHUNKS_TO_MAKE = 2000;
+    const CHUNKS_TO_MAKE = 10000;
     const chunks: Chunk[] = await Promise.all(
         new Array(CHUNKS_TO_MAKE)
             .fill(1)

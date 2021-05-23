@@ -1,3 +1,10 @@
 
-export const SECONDS_IN_1_WEEK = 60 * 60 * 24 * 7;
-export const SECONDS_IN_15_MINS= 60 * 15;
+export const SECONDS_IN_1_MINUTE = 60;
+export const SECONDS_IN_15_MINS = SECONDS_IN_1_MINUTE * 15;
+
+export const SECONDS_IN_1_HOUR = SECONDS_IN_1_MINUTE * 60;
+
+export const SECONDS_IN_1_DAY = SECONDS_IN_1_HOUR * 24;
+export const SECONDS_IN_3_DAYS = SECONDS_IN_1_DAY * 3;
+
+export const SECONDS_IN_1_WEEK = SECONDS_IN_1_DAY * 7;
